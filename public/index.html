@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>AttendX</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <div id="toast-container"></div>
+
+  <!-- LOADER -->
+  <div id="app-loader">
+    <div class="loader-logo">
+      <span class="loader-icon">✦</span>
+      <span class="loader-wordmark">AttendX</span>
+    </div>
+    <div class="loader-bar"><div class="loader-fill"></div></div>
+  </div>
+
+  <div id="app" class="hidden">
+
+    <!-- ══════════════════ LOGIN ══════════════════ -->
+    <div id="screen-login" class="screen active">
+      <div class="login-bg">
+        <div class="login-blob b1"></div>
+        <div class="login-blob b2"></div>
+        <div class="login-blob b3"></div>
+      </div>
+      <div class="login-card">
+        <div class="login-header">
+          <div class="brand-mark">✦</div>
+          <h1 class="brand-name">AttendX</h1>
+          <p class="brand-sub">Smart Attendance &amp; Task Hub</p>
+        </div>
+        <form id="login-form" autocomplete="off">
+          <div class="field-group">
+            <label class="field-label">Username</label>
+            <div class="field-wrap">
+              <span class="field-icon">◎</span>
+              <input type="text" id="login-username" class="field-input" placeholder="Enter username" autocomplete="username" />
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Password</label>
+            <div class="field-wrap">
+              <span class="field-icon">◈</span>
+              <input type="password" id="login-password" class="field-input" placeholder="Enter password" autocomplete="current-password" />
+              <button type="button" class="field-toggle" id="pw-toggle">👁</button>
+            </div>
+          </div>
+          <button type="submit" class="btn-primary btn-login" id="login-btn">
+            <span class="btn-text">Sign In</span>
+            <span class="btn-arrow">→</span>
+          </button>
+        </form>
+        <p class="login-hint">Admin: <code>admin / admin123</code> &nbsp;·&nbsp; Staff: <code>alice / pass123</code></p>
+      </div>
+    </div>
+
+    <!-- ══════════════════ MEMBER DASHBOARD ══════════════════ -->
+    <div id="screen-member" class="screen">
+      <header class="topbar">
+        <div class="topbar-left">
+          <span class="topbar-mark">✦</span>
+          <span class="topbar-title">AttendX</span>
+        </div>
+        <div class="topbar-right">
+          <button class="avatar-btn" id="member-avatar-btn">
+            <span id="member-avatar-initials">–</span>
+          </button>
+        </div>
+      </header>
+
+      <main class="page-content" id="member-content">
+        <section class="hero-section">
+          <div class="hero-time" id="member-clock">00:00</div>
+          <h2 class="hero-greeting" id="member-greeting">Good morning</h2>
+          <p class="hero-name" id="member-name">Loading…</p>
+          <div class="hero-date" id="member-date">–</div>
+        </section>
+
+        <section class="status-card" id="attendance-status-card">
+          <div class="status-indicator" id="status-indicator">
+            <span class="status-dot"></span>
+            <span class="status-label" id="status-label">Checking…</span>
+          </div>
+          <button class="btn-checkin" id="checkin-btn" disabled>
+            <span class="checkin-icon">◎</span>
+            <div class="checkin-text-wrap">
+              <span class="checkin-text">Mark Attendance</span>
+              <span class="checkin-sub" id="checkin-sub">Loading…</span>
+            </div>
+            <span class="checkin-arrow">→</span>
+          </button>
+        </section>
+
+        <section class="stats-row">
+          <div class="stat-chip">
+            <span class="stat-val" id="member-present">–</span>
+            <span class="stat-key">Present</span>
+          </div>
+          <div class="stat-chip">
+            <span class="stat-val" id="member-working">–</span>
+            <span class="stat-key">Working Days</span>
+          </div>
+          <div class="stat-chip accent">
+            <span class="stat-val" id="member-pct">–%</span>
+            <span class="stat-key">Attendance</span>
+          </div>
+        </section>
+
+        <section class="section-block">
+          <div class="section-head">
+            <h3 class="section-title">My Tasks</h3>
+            <span class="section-badge" id="tasks-badge">0</span>
+          </div>
+          <div id="member-tasks-list" class="tasks-list">
+            <div class="empty-state">No tasks assigned yet.</div>
+          </div>
+        </section>
+
+        <section class="section-block">
+          <div class="section-head">
+            <h3 class="section-title">Attendance History</h3>
+          </div>
+          <div id="member-history-list" class="history-list">
+            <div class="empty-state">No records yet.</div>
+          </div>
+        </section>
+      </main>
+
+      <nav class="bottom-nav">
+        <button class="nav-item active" data-tab="home" onclick="memberTab('home',this)">
+          <span class="nav-icon">⌂</span><span class="nav-label">Home</span>
+        </button>
+        <button class="nav-item" data-tab="history" onclick="memberTab('history',this)">
+          <span class="nav-icon">◷</span><span class="nav-label">History</span>
+        </button>
+        <button class="nav-item" data-tab="tasks" onclick="memberTab('tasks',this)">
+          <span class="nav-icon">◫</span><span class="nav-label">Tasks</span>
+        </button>
+        <button class="nav-item" data-tab="profile" onclick="memberTab('profile',this)">
+          <span class="nav-icon">⚙</span><span class="nav-label">Profile</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- ══════════════════ ADMIN DASHBOARD ══════════════════ -->
+    <div id="screen-admin" class="screen">
+      <header class="topbar topbar-admin">
+        <div class="topbar-left">
+          <span class="topbar-mark">✦</span>
+          <span class="topbar-title">AttendX <em>Admin</em></span>
+        </div>
+        <div class="topbar-right">
+          <button class="avatar-btn admin" id="admin-avatar-btn">
+            <span id="admin-avatar-initials">A</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Overview strip -->
+      <div class="admin-overview">
+        <div class="overview-card oc-primary">
+          <span class="oc-val" id="ov-present">–</span>
+          <span class="oc-label">Present</span>
+        </div>
+        <div class="overview-card oc-muted">
+          <span class="oc-val" id="ov-members">–</span>
+          <span class="oc-label">Members</span>
+        </div>
+        <div class="overview-card oc-accent">
+          <span class="oc-val" id="ov-tasks">–</span>
+          <span class="oc-label">Open Tasks</span>
+        </div>
+        <div class="overview-card oc-late">
+          <span class="oc-val" id="ov-late">–</span>
+          <span class="oc-label">Late Today</span>
+        </div>
+      </div>
+
+      <main class="page-content admin-page-content" id="admin-content">
+
+        <!-- TODAY -->
+        <section class="admin-tab-section" id="admin-today-section">
+          <div class="section-block">
+            <div class="section-head">
+              <h3 class="section-title">Today's Check-ins</h3>
+              <span class="section-date" id="admin-today-date">–</span>
+            </div>
+            <div id="absent-strip" class="absent-strip"></div>
+            <div id="admin-today-list" class="attendance-table-wrap">
+              <div class="empty-state">No check-ins yet today.</div>
+            </div>
+          </div>
+          <div class="section-block">
+            <div class="section-head">
+              <h3 class="section-title">Monthly Stats</h3>
+              <input type="month" id="stats-month" class="filter-input small" />
+            </div>
+            <div id="admin-stats-list" class="stats-table-wrap">
+              <div class="empty-state">Loading…</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TEAM -->
+        <section class="admin-tab-section hidden" id="admin-members-section">
+          <div class="section-block">
+            <div class="section-head">
+              <h3 class="section-title">Team Members</h3>
+              <button class="btn-add" id="btn-add-member">+ Add Member</button>
+            </div>
+            <div class="search-bar-wrap">
+              <span class="search-icon">⌕</span>
+              <input type="text" id="member-search" class="search-input" placeholder="Search name or username…" oninput="filterMembers()" />
+            </div>
+            <div id="admin-members-list" class="members-grid">
+              <div class="empty-state">No members yet.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- LOG -->
+        <section class="admin-tab-section hidden" id="admin-log-section">
+          <div class="section-block">
+            <div class="section-head">
+              <h3 class="section-title">Attendance Log</h3>
+              <button class="btn-export" id="btn-export-att">↓ CSV</button>
+            </div>
+            <div class="filter-row">
+              <input type="month" id="filter-month" class="filter-input" />
+              <select id="filter-member" class="filter-input">
+                <option value="">All Members</option>
+              </select>
+              <button class="btn-filter" id="btn-apply-filter">Filter</button>
+            </div>
+            <div id="admin-log-list" class="attendance-table-wrap">
+              <div class="empty-state">Select a month and click Filter.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TASKS -->
+        <section class="admin-tab-section hidden" id="admin-tasks-section">
+          <div class="section-block">
+            <div class="section-head">
+              <h3 class="section-title">Task Board</h3>
+              <div class="head-actions">
+                <div class="task-view-toggle">
+                  <button class="tvt-btn active" id="tvt-list" onclick="setTaskView('list',this)">≡ List</button>
+                  <button class="tvt-btn" id="tvt-board" onclick="setTaskView('board',this)">⊞ Board</button>
+                </div>
+                <button class="btn-export" id="btn-export-tasks">↓ CSV</button>
+                <button class="btn-add" id="btn-add-task">+ Task</button>
+              </div>
+            </div>
+            <div class="task-filters">
+              <select id="task-filter-assignee" class="filter-input small" onchange="renderAdminTasksFiltered()">
+                <option value="">All Members</option>
+              </select>
+              <select id="task-filter-priority" class="filter-input small" onchange="renderAdminTasksFiltered()">
+                <option value="">All Priorities</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+              </select>
+              <select id="task-filter-status" class="filter-input small" onchange="renderAdminTasksFiltered()">
+                <option value="">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="in-progress">In Progress</option>
+                <option value="done">Done</option>
+              </select>
+            </div>
+            <div id="tasks-list-view">
+              <div id="admin-tasks-list" class="tasks-list">
+                <div class="empty-state">No tasks yet.</div>
+              </div>
+            </div>
+            <div id="tasks-board-view" class="kanban-board hidden">
+              <div class="kanban-col">
+                <div class="kanban-col-header">
+                  <span class="kcol-dot" style="background:var(--muted)"></span>
+                  <span class="kcol-title">Pending</span>
+                  <span class="kcol-count" id="kcount-pending">0</span>
+                </div>
+                <div class="kanban-cards" id="kanban-pending" data-status="pending"></div>
+              </div>
+              <div class="kanban-col">
+                <div class="kanban-col-header">
+                  <span class="kcol-dot" style="background:var(--primary)"></span>
+                  <span class="kcol-title">In Progress</span>
+                  <span class="kcol-count" id="kcount-in-progress">0</span>
+                </div>
+                <div class="kanban-cards" id="kanban-in-progress" data-status="in-progress"></div>
+              </div>
+              <div class="kanban-col">
+                <div class="kanban-col-header">
+                  <span class="kcol-dot" style="background:var(--accent)"></span>
+                  <span class="kcol-title">Done</span>
+                  <span class="kcol-count" id="kcount-done">0</span>
+                </div>
+                <div class="kanban-cards" id="kanban-done" data-status="done"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SETTINGS -->
+        <section class="admin-tab-section hidden" id="admin-settings-section">
+          <div class="section-block">
+            <div class="section-head"><h3 class="section-title">Admin Profile</h3></div>
+            <div class="admin-profile-card">
+              <div class="apc-avatar" id="apc-avatar">A</div>
+              <div class="apc-info">
+                <div class="apc-name" id="apc-name">–</div>
+                <div class="apc-role">Administrator</div>
+              </div>
+            </div>
+          </div>
+          <div class="section-block">
+            <div class="section-head"><h3 class="section-title">Export &amp; Backup</h3></div>
+            <div class="settings-grid">
+              <button class="settings-card" id="btn-export-att-s">
+                <div class="sc-icon-wrap sc-primary">↓</div>
+                <div class="sc-text"><span class="sc-label">Export Attendance</span><span class="sc-sub">Download CSV report</span></div>
+              </button>
+              <button class="settings-card" id="btn-export-tasks-s">
+                <div class="sc-icon-wrap sc-accent">↓</div>
+                <div class="sc-text"><span class="sc-label">Export Tasks</span><span class="sc-sub">Download CSV</span></div>
+              </button>
+              <button class="settings-card" id="btn-backup">
+                <div class="sc-icon-wrap sc-muted">⬡</div>
+                <div class="sc-text"><span class="sc-label">Backup Database</span><span class="sc-sub">Download .db file</span></div>
+              </button>
+            </div>
+          </div>
+          <div class="section-block">
+            <div class="section-head"><h3 class="section-title">Account</h3></div>
+            <div class="settings-grid">
+              <button class="settings-card" id="btn-change-pw-admin">
+                <div class="sc-icon-wrap sc-muted">🔑</div>
+                <div class="sc-text"><span class="sc-label">Change Password</span><span class="sc-sub">Update credentials</span></div>
+              </button>
+              <button class="settings-card danger" id="btn-logout-admin">
+                <div class="sc-icon-wrap sc-danger">⏻</div>
+                <div class="sc-text"><span class="sc-label">Sign Out</span><span class="sc-sub">End session</span></div>
+              </button>
+            </div>
+          </div>
+        </section>
+
+      </main>
+
+      <nav class="bottom-nav">
+        <button class="nav-item active" data-tab="today" onclick="adminTab('today',this)">
+          <span class="nav-icon">◎</span><span class="nav-label">Today</span>
+        </button>
+        <button class="nav-item" data-tab="team" onclick="adminTab('team',this)">
+          <span class="nav-icon">◫</span><span class="nav-label">Team</span>
+        </button>
+        <button class="nav-item" data-tab="log" onclick="adminTab('log',this)">
+          <span class="nav-icon">◷</span><span class="nav-label">Log</span>
+        </button>
+        <button class="nav-item" data-tab="tasks" onclick="adminTab('tasks',this)">
+          <span class="nav-icon">✓</span><span class="nav-label">Tasks</span>
+        </button>
+        <button class="nav-item" data-tab="settings" onclick="adminTab('settings',this)">
+          <span class="nav-icon">⚙</span><span class="nav-label">Settings</span>
+        </button>
+      </nav>
+    </div>
+
+  </div><!-- #app -->
+
+  <!-- ══════════════════ MODALS ══════════════════ -->
+
+  <!-- Check-in / Camera -->
+  <div id="modal-checkin" class="modal-overlay hidden">
+    <div class="modal-box checkin-modal-box">
+      <div class="ci-header">
+        <div class="ci-header-left">
+          <div class="ci-step-pill" id="ci-step-pill">Step 1 of 3</div>
+          <h3 class="ci-title" id="ci-title">Position Your Face</h3>
+        </div>
+        <button class="modal-close" id="btn-close-checkin">✕</button>
+      </div>
+      <div class="ci-step" id="ci-step-camera">
+        <div class="viewfinder">
+          <video id="camera-preview" autoplay playsinline muted></video>
+          <canvas id="camera-canvas" class="hidden"></canvas>
+          <img id="photo-preview" class="hidden" alt="" />
+          <div class="face-guide" id="face-guide">
+            <svg viewBox="0 0 220 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="110" cy="140" rx="85" ry="110" stroke="white" stroke-width="2.5"
+                stroke-dasharray="8 5" stroke-linecap="round" opacity="0.7"/>
+            </svg>
+          </div>
+          <div class="countdown-overlay hidden" id="countdown-overlay">
+            <span class="countdown-num" id="countdown-num">3</span>
+          </div>
+          <div class="flash-overlay hidden" id="flash-overlay"></div>
+          <div class="corner tl"></div><div class="corner tr"></div>
+          <div class="corner bl"></div><div class="corner br"></div>
+          <div class="cam-init-overlay" id="cam-init-overlay">
+            <div class="cam-init-spinner"></div>
+            <span>Starting camera…</span>
+          </div>
+          <div class="cam-error-overlay hidden" id="cam-error-overlay">
+            <span class="cam-error-icon">⚠</span>
+            <p id="cam-error-msg">Camera unavailable</p>
+            <button class="btn-retry-cam" id="btn-retry-cam">Try Again</button>
+          </div>
+        </div>
+        <div class="cam-meta-strip">
+          <div class="cam-meta-item">
+            <span class="cam-meta-icon">◷</span>
+            <span class="cam-meta-val" id="cam-time-val">--:--:--</span>
+          </div>
+          <div class="cam-meta-sep"></div>
+          <div class="cam-meta-item">
+            <span class="cam-meta-icon gps-pulse" id="gps-icon">◎</span>
+            <span class="cam-meta-val" id="cam-loc-val">Locating…</span>
+          </div>
+          <div class="cam-meta-sep"></div>
+          <div class="cam-meta-item">
+            <span class="cam-meta-icon">◈</span>
+            <span class="cam-meta-val" id="cam-late-val">–</span>
+          </div>
+        </div>
+        <div class="late-warning hidden" id="late-warning">
+          <span>⚠</span>
+          <span>Check-in after 10:00 AM is flagged as <strong>Late</strong></span>
+        </div>
+        <div class="ci-actions">
+          <button class="btn-capture-new" id="btn-capture" onclick="capturePhoto()">
+            <div class="capture-outer"><div class="capture-inner"></div></div>
+            <span class="capture-label">Tap to Capture</span>
+          </button>
+        </div>
+      </div>
+      <div class="ci-step hidden" id="ci-step-review">
+        <div class="review-photo-wrap">
+          <img id="review-photo" class="review-photo" alt="" />
+          <div class="review-badge" id="review-badge">
+            <span id="review-badge-icon">✓</span>
+            <span id="review-badge-text">On Time</span>
+          </div>
+        </div>
+        <div class="review-details">
+          <div class="review-detail-row">
+            <span class="rdr-icon">◷</span>
+            <div class="rdr-body">
+              <span class="rdr-label">Date &amp; Time</span>
+              <span class="rdr-val" id="review-datetime">–</span>
+            </div>
+          </div>
+          <div class="review-detail-row">
+            <span class="rdr-icon">◎</span>
+            <div class="rdr-body">
+              <span class="rdr-label">Location</span>
+              <span class="rdr-val" id="review-location">–</span>
+            </div>
+          </div>
+          <div class="review-detail-row">
+            <span class="rdr-icon">◈</span>
+            <div class="rdr-body">
+              <span class="rdr-label">Status</span>
+              <span class="rdr-val" id="review-status">–</span>
+            </div>
+          </div>
+        </div>
+        <div class="ci-actions row">
+          <button class="btn-retake-new" onclick="retakePhoto()">↺ Retake</button>
+          <button class="btn-submit-new" id="btn-submit-checkin" onclick="submitCheckin()">Submit Attendance →</button>
+        </div>
+      </div>
+      <div class="ci-step hidden" id="ci-step-success">
+        <div class="success-anim">
+          <div class="success-ring"></div>
+          <div class="success-check">✓</div>
+        </div>
+        <h3 class="success-title" id="success-title">Attendance Marked!</h3>
+        <p class="success-sub" id="success-sub">You're all set for today.</p>
+        <div class="success-chips">
+          <div class="success-chip" id="sc-time">–</div>
+          <div class="success-chip" id="sc-status">–</div>
+        </div>
+        <button class="btn-submit-new full" onclick="closeModal('modal-checkin')">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Member -->
+  <div id="modal-add-member" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">Add Member</h3>
+        <button class="modal-close" onclick="closeModal('modal-add-member')">✕</button>
+      </div>
+      <form id="form-add-member">
+        <div class="field-group">
+          <label class="field-label">Full Name</label>
+          <div class="field-wrap"><input type="text" id="new-member-name" class="field-input no-icon" placeholder="Jane Doe" /></div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Username</label>
+          <div class="field-wrap"><input type="text" id="new-member-username" class="field-input no-icon" placeholder="jane" /></div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Temporary Password</label>
+          <div class="field-wrap"><input type="password" id="new-member-password" class="field-input no-icon" placeholder="Min 6 characters" /></div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" onclick="closeModal('modal-add-member')">Cancel</button>
+          <button type="submit" class="btn-primary">Add Member</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add / Edit Task -->
+  <div id="modal-add-task" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title" id="task-modal-title">New Task</h3>
+        <button class="modal-close" onclick="closeModal('modal-add-task')">✕</button>
+      </div>
+      <form id="form-add-task">
+        <input type="hidden" id="edit-task-id" />
+        <div class="field-group">
+          <label class="field-label">Title</label>
+          <div class="field-wrap"><input type="text" id="task-title" class="field-input no-icon" placeholder="Task title" /></div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Description</label>
+          <div class="field-wrap"><textarea id="task-desc" class="field-input no-icon field-textarea" placeholder="Details…" rows="3"></textarea></div>
+        </div>
+        <div class="form-row">
+          <div class="field-group half">
+            <label class="field-label">Assign To</label>
+            <div class="field-wrap"><select id="task-assignee" class="field-input no-icon"><option value="">Unassigned</option></select></div>
+          </div>
+          <div class="field-group half">
+            <label class="field-label">Due Date</label>
+            <div class="field-wrap"><input type="date" id="task-due" class="field-input no-icon" /></div>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Priority</label>
+          <div class="priority-chips">
+            <label class="pri-chip"><input type="radio" name="task-priority" value="low" /> Low</label>
+            <label class="pri-chip"><input type="radio" name="task-priority" value="medium" checked /> Medium</label>
+            <label class="pri-chip"><input type="radio" name="task-priority" value="high" /> High</label>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" onclick="closeModal('modal-add-task')">Cancel</button>
+          <button type="submit" class="btn-primary" id="task-submit-btn">Create Task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Task Detail -->
+  <div id="modal-task-detail" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">Task Detail</h3>
+        <button class="modal-close" onclick="closeModal('modal-task-detail')">✕</button>
+      </div>
+      <div class="td-priority-stripe" id="td-priority-stripe"></div>
+      <div class="td-title" id="td-title">–</div>
+      <div class="td-desc" id="td-desc"></div>
+      <div class="td-meta-grid">
+        <div class="td-meta-item"><span class="td-meta-label">Assignee</span><span class="td-meta-val" id="td-assignee">–</span></div>
+        <div class="td-meta-item"><span class="td-meta-label">Due Date</span><span class="td-meta-val" id="td-due">–</span></div>
+        <div class="td-meta-item"><span class="td-meta-label">Priority</span><span class="td-meta-val" id="td-priority-val">–</span></div>
+        <div class="td-meta-item"><span class="td-meta-label">Created</span><span class="td-meta-val" id="td-created">–</span></div>
+      </div>
+      <div class="td-status-row">
+        <span class="td-meta-label">Change Status</span>
+        <div class="td-status-chips" id="td-status-chips">
+          <button class="td-sc" data-status="pending"     onclick="setTaskStatusFromDetail('pending')">Pending</button>
+          <button class="td-sc" data-status="in-progress" onclick="setTaskStatusFromDetail('in-progress')">In Progress</button>
+          <button class="td-sc" data-status="done"        onclick="setTaskStatusFromDetail('done')">Done</button>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="td-btn-edit">✎ Edit</button>
+        <button class="btn-danger"    id="td-btn-delete">✕ Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Member Detail -->
+  <div id="modal-member-detail" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">Member Detail</h3>
+        <button class="modal-close" onclick="closeModal('modal-member-detail')">✕</button>
+      </div>
+      <div class="mdd-hero">
+        <div class="mdd-avatar" id="mdd-avatar">?</div>
+        <div class="mdd-info">
+          <div class="mdd-name" id="mdd-name">–</div>
+          <div class="mdd-username" id="mdd-username">–</div>
+          <div class="mdd-since" id="mdd-since">–</div>
+        </div>
+      </div>
+      <div class="mdd-stats-row">
+        <div class="mdd-stat"><span class="mdd-stat-val" id="mdd-present">–</span><span class="mdd-stat-key">Present</span></div>
+        <div class="mdd-stat"><span class="mdd-stat-val" id="mdd-late">–</span><span class="mdd-stat-key">Late</span></div>
+        <div class="mdd-stat accent"><span class="mdd-stat-val" id="mdd-pct">–%</span><span class="mdd-stat-key">This Month</span></div>
+      </div>
+      <div class="mdd-section-label">Recent Attendance</div>
+      <div id="mdd-history" class="mdd-history"></div>
+      <div class="mdd-section-label">Assigned Tasks</div>
+      <div id="mdd-tasks" class="mdd-tasks"></div>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeModal('modal-member-detail')">Close</button>
+        <button class="btn-danger" id="mdd-btn-remove">Remove Member</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Change Password -->
+  <div id="modal-change-pw" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">Change Password</h3>
+        <button class="modal-close" onclick="closeModal('modal-change-pw')">✕</button>
+      </div>
+      <form id="form-change-pw">
+        <div class="field-group">
+          <label class="field-label">Current Password</label>
+          <div class="field-wrap"><input type="password" id="cp-current" class="field-input no-icon" placeholder="Current password" /></div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">New Password</label>
+          <div class="field-wrap"><input type="password" id="cp-new" class="field-input no-icon" placeholder="Min 6 characters" /></div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Confirm New Password</label>
+          <div class="field-wrap"><input type="password" id="cp-confirm" class="field-input no-icon" placeholder="Repeat new password" /></div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" onclick="closeModal('modal-change-pw')">Cancel</button>
+          <button type="submit" class="btn-primary">Update Password</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Member Profile -->
+  <div id="modal-profile" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">My Profile</h3>
+        <button class="modal-close" onclick="closeModal('modal-profile')">✕</button>
+      </div>
+      <div class="profile-avatar-big" id="profile-avatar-big">?</div>
+      <div class="profile-name" id="profile-name">–</div>
+      <div class="profile-username" id="profile-username">–</div>
+      <div class="modal-actions col">
+        <button class="btn-secondary full" onclick="closeModal('modal-profile');openModal('modal-change-pw')">🔑 Change Password</button>
+        <button class="btn-danger full" id="btn-logout-member">⏻ Sign Out</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Photo lightbox -->
+  <div id="modal-photo" class="modal-overlay hidden" onclick="closeModal('modal-photo')">
+    <div class="photo-modal-box">
+      <img id="photo-full" src="" alt="Attendance photo" />
+      <div class="photo-meta" id="photo-meta"></div>
+    </div>
+  </div>
+
+  <!-- Confirm dialog -->
+  <div id="modal-confirm" class="modal-overlay hidden">
+    <div class="modal-box confirm-box">
+      <div class="confirm-icon" id="confirm-icon">⚠</div>
+      <h3 class="confirm-title" id="confirm-title">Are you sure?</h3>
+      <p  class="confirm-body"  id="confirm-body">This cannot be undone.</p>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="confirm-cancel-btn">Cancel</button>
+        <button class="btn-danger"    id="confirm-ok-btn">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
