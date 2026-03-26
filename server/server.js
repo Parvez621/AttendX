@@ -6,7 +6,7 @@ const path    = require('path');
 const fs      = require('fs');
 const crypto  = require('crypto');
 
-const { initializeDatabase, dbRun, dbGet, dbAll } = require('./database');
+const { initializeDatabase, dbRun, dbGet, dbAll } = require('./database.js');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
