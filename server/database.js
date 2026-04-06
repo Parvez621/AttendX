@@ -75,17 +75,21 @@ async function initializeDatabase() {
   )`);
 
   await dbRun(`CREATE TABLE IF NOT EXISTS tasks (
-    id          INTEGER PRIMARY KEY AUTOINCREMENT,
-    title       TEXT NOT NULL,
-    description TEXT,
-    assigned_to INTEGER REFERENCES members(id) ON DELETE SET NULL,
-    due_date    TEXT,
-    priority    TEXT DEFAULT 'medium',
-    status      TEXT DEFAULT 'pending',
-    created_by  INTEGER,
-    created_at  TEXT DEFAULT (datetime('now')),
-    updated_at  TEXT DEFAULT (datetime('now'))
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    title        TEXT NOT NULL,
+    description  TEXT,
+    assigned_to  INTEGER REFERENCES members(id) ON DELETE SET NULL,
+    due_date     TEXT,
+    priority     TEXT DEFAULT 'medium',
+    status       TEXT DEFAULT 'pending',
+    created_by   INTEGER,
+    created_at   TEXT DEFAULT (datetime('now')),
+    updated_at   TEXT DEFAULT (datetime('now')),
+    completed_at TEXT DEFAULT NULL
   )`);
+
+  // Migrate existing DB: add completed_at if it doesn't exist yet
+  await dbRun(`ALTER TABLE tasks ADD COLUMN completed_at TEXT DEFAULT NULL`).catch(() => {});
 
   // Seed only on first run
   const adminCount = await dbGet('SELECT COUNT(*) AS c FROM admins');

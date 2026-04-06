@@ -6,7 +6,7 @@ const path    = require('path');
 const fs      = require('fs');
 const crypto  = require('crypto');
 
-const { initializeDatabase, dbRun, dbGet, dbAll } = require('./database.js');
+const { initializeDatabase, dbRun, dbGet, dbAll } = require('./database');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -316,18 +316,29 @@ app.put('/api/tasks/:id', requireAuth, async (req, res) => {
     if (user.role !== 'admin') {
       if (task.assigned_to !== user.id)
         return res.status(403).json({ error: 'Not authorised' });
+      const newStatus      = status || task.status;
+      const completedAt    = newStatus === 'done' && task.status !== 'done' ? "datetime('now')" : null;
+      const completedParam = newStatus === 'done' && task.status !== 'done';
       await dbRun(
-        `UPDATE tasks SET status=?, updated_at=datetime('now') WHERE id=?`,
-        [status || task.status, req.params.id]
+        `UPDATE tasks SET status=?, updated_at=datetime('now'),
+         completed_at=CASE WHEN ? THEN datetime('now') ELSE completed_at END WHERE id=?`,
+        [newStatus, completedParam ? 1 : 0, req.params.id]
       );
       return res.json({ success: true });
     }
+    const newStatus   = status ?? task.status;
+    const markingDone = newStatus === 'done' && task.status !== 'done';
+    const clearDone   = newStatus !== 'done' && task.status === 'done';
     await dbRun(
       `UPDATE tasks SET title=?,description=?,assigned_to=?,due_date=?,priority=?,status=?,
-       updated_at=datetime('now') WHERE id=?`,
+       updated_at=datetime('now'),
+       completed_at=CASE WHEN ? THEN datetime('now') WHEN ? THEN NULL ELSE completed_at END
+       WHERE id=?`,
       [title ?? task.title, description ?? task.description,
        assigned_to ?? task.assigned_to, due_date ?? task.due_date,
-       priority ?? task.priority, status ?? task.status, req.params.id]
+       priority ?? task.priority, newStatus,
+       markingDone ? 1 : 0, clearDone ? 1 : 0,
+       req.params.id]
     );
     res.json({ success: true });
   } catch (err) { res.status(500).json({ error: err.message }); }

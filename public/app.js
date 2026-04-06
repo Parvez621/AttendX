@@ -201,10 +201,29 @@ function renderMemberTasks(tasks) {
 }
 
 async function cycleTaskStatus(id, current) {
-  const next = { pending:'in-progress', 'in-progress':'done', done:'pending' };
+  const nextMap = { pending:'in-progress', 'in-progress':'done', done:'pending' };
+  const next    = nextMap[current] || 'pending';
+
+  // Require confirmation before marking as done
+  if (next === 'done') {
+    confirmAction(
+      'Mark task as Done?',
+      'This will record the completion timestamp. You can still reopen it later.',
+      '✓',
+      async () => {
+        try {
+          await api('PUT', `/api/tasks/${id}`, { status: 'done' });
+          toast('Task marked as Done ✓', 'success');
+          loadMemberTasks();
+        } catch (e) { toast(e.message, 'error'); }
+      }
+    );
+    return;
+  }
+
   try {
-    await api('PUT', `/api/tasks/${id}`, { status: next[current] || 'pending' });
-    toast(`Marked as ${fmtStatus(next[current])}`, 'success');
+    await api('PUT', `/api/tasks/${id}`, { status: next });
+    toast(`Marked as ${fmtStatus(next)}`, 'success');
     loadMemberTasks();
   } catch (e) { toast(e.message, 'error'); }
 }
@@ -762,6 +781,18 @@ window.openTaskDetail = function(id) {
   setText('td-due',         t.due_date ? fmtDate(t.due_date) : '—');
   setText('td-priority-val',cap(t.priority));
   setText('td-created',     t.created_at ? fmtDate(t.created_at.slice(0,10)) : '—');
+  // Updated at
+  setText('td-updated', t.updated_at ? fmtDateTime(t.updated_at) : '—');
+
+  // Completed at — show/hide row
+  const completedRow = document.getElementById('td-completed-row');
+  if (t.completed_at) {
+    completedRow.classList.remove('hidden');
+    setText('td-completed', fmtDateTime(t.completed_at));
+  } else {
+    completedRow.classList.add('hidden');
+  }
+
   document.querySelectorAll('.td-sc').forEach(btn =>
     btn.classList.toggle('active', btn.dataset.status === t.status || (btn.dataset.status === 'done' && t.status === 'completed'))
   );
@@ -770,12 +801,29 @@ window.openTaskDetail = function(id) {
 
 window.setTaskStatusFromDetail = async function(status) {
   if (!_detailTaskId) return;
-  try {
-    await api('PUT', `/api/tasks/${_detailTaskId}`, { status });
-    document.querySelectorAll('.td-sc').forEach(btn => btn.classList.toggle('active', btn.dataset.status === status));
-    toast(`Status → ${fmtStatus(status)}`, 'success');
-    await loadAdminTasks();
-  } catch (e) { toast(e.message, 'error'); }
+
+  const doUpdate = async () => {
+    try {
+      await api('PUT', `/api/tasks/${_detailTaskId}`, { status });
+      document.querySelectorAll('.td-sc').forEach(btn => btn.classList.toggle('active', btn.dataset.status === status));
+      toast(`Status → ${fmtStatus(status)}`, 'success');
+      await loadAdminTasks();
+      // Refresh timestamps in the open modal
+      const t = allTasks.find(t => t.id === _detailTaskId);
+      if (t) {
+        setText('td-updated', t.updated_at ? fmtDateTime(t.updated_at) : '—');
+        const completedRow = document.getElementById('td-completed-row');
+        if (t.completed_at) { completedRow.classList.remove('hidden'); setText('td-completed', fmtDateTime(t.completed_at)); }
+        else                { completedRow.classList.add('hidden'); }
+      }
+    } catch (e) { toast(e.message, 'error'); }
+  };
+
+  if (status === 'done') {
+    confirmAction('Mark task as Done?', 'The completion timestamp will be saved.', '✓', doUpdate);
+  } else {
+    await doUpdate();
+  }
 };
 
 function openAddTaskModal() {
@@ -913,6 +961,14 @@ function fmtDate(d) {
   return `${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(m)-1]} ${parseInt(day)}, ${y}`;
 }
 function fmtStatus(s) { return {pending:'Pending','in-progress':'In Progress',done:'Done',completed:'Done'}[s]||s; }
+function fmtDateTime(dt) {
+  if (!dt) return '—';
+  // dt is like "2024-04-06 14:32:11" from SQLite datetime('now')
+  const d = new Date(dt.replace(' ', 'T'));
+  if (isNaN(d)) return dt;
+  return d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' })
+    + ' ' + d.toLocaleTimeString('en-GB', { hour12: false });
+}
 function shortLoc(loc) { if(!loc) return '—'; return loc.length>40 ? loc.slice(0,38)+'…' : loc; }
 function isDue(d,s)    { if(!d||s==='done'||s==='completed') return false; return new Date(d)<new Date(new Date().toDateString()); }
 function sleep(ms)     { return new Promise(r => setTimeout(r, ms)); }

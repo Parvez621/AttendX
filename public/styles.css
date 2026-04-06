@@ -668,3 +668,14 @@ select.field-input  { cursor:pointer; }
 @media (prefers-reduced-motion:reduce) {
   *,*::before,*::after { animation-duration:.01ms !important; transition-duration:.01ms !important; }
 }
+
+/* ── Task completed_at timestamp row ── */
+.td-completed-row .td-meta-val {
+  color: var(--accent);
+  font-weight: 600;
+  font-family: var(--font-m);
+  font-size: .82rem;
+}
+.td-meta-grid {
+  grid-template-columns: 1fr 1fr;
+}
