@@ -18,6 +18,7 @@ let _countdownTimer  = null;
 // Detail modal state
 let _detailTaskId   = null;
 let _detailMemberId = null;
+let _todayPhotoAutoOpenTimer = null;
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
@@ -140,9 +141,37 @@ async function loadMemberStatus() {
   const label     = document.getElementById('status-label');
   const btn       = document.getElementById('checkin-btn');
   const sub       = document.getElementById('checkin-sub');
+  const todayPhoto = document.getElementById('today-photo');
+  const todayPhotoEmpty = document.getElementById('today-photo-empty');
+  const todayTime = document.getElementById('today-time');
+
+  const showTodaySnapshot = rec => {
+    if (_todayPhotoAutoOpenTimer) {
+      clearTimeout(_todayPhotoAutoOpenTimer);
+      _todayPhotoAutoOpenTimer = null;
+    }
+
+    if (rec?.photo_path) {
+      todayPhoto.src = rec.photo_path;
+      todayPhoto.onclick = () => viewPhoto(rec.photo_path, `${rec.date} ${rec.time}`);
+      todayPhoto.classList.remove('hidden');
+      todayPhotoEmpty.classList.add('hidden');
+      _todayPhotoAutoOpenTimer = setTimeout(() => {
+        todayPhoto.click();
+      }, 5000);
+    } else {
+      todayPhoto.removeAttribute('src');
+      todayPhoto.onclick = null;
+      todayPhoto.classList.add('hidden');
+      todayPhotoEmpty.classList.remove('hidden');
+    }
+    todayTime.textContent = rec?.time || '--:--:--';
+  };
+
   try {
     const res = await api('GET', '/api/attendance/today');
     const rec = res.attendance[0];
+    showTodaySnapshot(rec);
     if (rec) {
       indicator.className = `status-indicator ${rec.is_late ? 'late' : 'present'}`;
       label.textContent   = rec.is_late ? '⚠ Marked Late' : '✓ Present Today';
@@ -160,6 +189,7 @@ async function loadMemberStatus() {
     label.textContent = 'Status unavailable';
     btn.disabled = false;
     sub.textContent = 'Tap to mark attendance';
+    showTodaySnapshot(null);
   }
 }
 

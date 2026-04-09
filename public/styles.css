@@ -206,9 +206,11 @@ select.field-input  { cursor:pointer; }
   content:'✦'; position:absolute; right:20px; top:20px;
   font-size:80px; color:rgba(255,255,255,.07); line-height:1; pointer-events:none;
 }
-.hero-time  { font-family:var(--font-m); font-size:2.4rem; font-weight:500; color:rgba(255,255,255,.9); letter-spacing:-.5px; line-height:1; margin-bottom:4px; }
+.hero-main { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
+.hero-identity { min-width:0; }
+.hero-time  { font-family:var(--font-m); font-size:1.35rem; font-weight:500; color:rgba(255,255,255,.9); letter-spacing:-.5px; line-height:1; margin-top:4px; flex-shrink:0; text-align:right; }
 .hero-greeting { font-size:.875rem; color:rgba(255,255,255,.65); font-weight:400; margin-bottom:2px; }
-.hero-name  { font-family:var(--font-d); font-size:1.5rem; font-weight:700; color:#fff; letter-spacing:-.3px; margin-bottom:8px; }
+.hero-name  { font-family:var(--font-d); font-size:2rem; font-weight:800; color:#fff; letter-spacing:-.3px; margin-bottom:8px; line-height:1.05; }
 .hero-date  { font-size:.8rem; color:rgba(255,255,255,.55); font-family:var(--font-m); }
 
 /* Status card */
@@ -238,6 +240,22 @@ select.field-input  { cursor:pointer; }
 .checkin-sub  { font-size:.75rem; color:rgba(255,255,255,.7); display:block; margin-top:1px; }
 .btn-checkin:disabled .checkin-sub { color:var(--muted); }
 .checkin-arrow { font-size:1.1rem; flex-shrink:0; }
+.btn-checkin { display:none; }
+
+.attendance-snapshot {
+  display:flex; align-items:center; gap:12px;
+  border:1px solid var(--border); border-radius:var(--radius-sm);
+  background:var(--surface2); padding:10px;
+}
+.attendance-photo-wrap {
+  width:56px; height:56px; border-radius:10px; overflow:hidden; flex-shrink:0;
+  background:var(--primary-l); display:flex; align-items:center; justify-content:center;
+}
+.attendance-photo { width:100%; height:100%; object-fit:cover; display:block; }
+.attendance-photo-empty { font-size:.67rem; color:var(--primary); font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
+.attendance-meta { min-width:0; display:flex; flex-direction:column; gap:2px; }
+.attendance-meta-key { font-size:.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; font-weight:700; }
+.attendance-meta-val { font-size:1rem; color:var(--text); font-family:var(--font-m); font-weight:500; }
 
 /* Stats row */
 .stats-row { display:flex; gap:10px; padding:16px 16px 0; }
