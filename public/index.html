@@ -78,10 +78,14 @@
 
       <main class="page-content" id="member-content">
         <section class="hero-section">
-          <div class="hero-time" id="member-clock">00:00</div>
-          <h2 class="hero-greeting" id="member-greeting">Good morning</h2>
-          <p class="hero-name" id="member-name">Loading…</p>
-          <div class="hero-date" id="member-date">–</div>
+          <div class="hero-main">
+            <div class="hero-identity">
+              <h2 class="hero-greeting" id="member-greeting">Good morning</h2>
+              <p class="hero-name" id="member-name">Loading…</p>
+              <div class="hero-date" id="member-date">–</div>
+            </div>
+            <div class="hero-time" id="member-clock">00:00</div>
+          </div>
         </section>
 
         <section class="status-card" id="attendance-status-card">
@@ -97,6 +101,16 @@
             </div>
             <span class="checkin-arrow">→</span>
           </button>
+          <div class="attendance-snapshot">
+            <div class="attendance-photo-wrap">
+              <img id="today-photo" class="attendance-photo hidden" alt="Today's attendance photo" />
+              <div id="today-photo-empty" class="attendance-photo-empty">No photo</div>
+            </div>
+            <div class="attendance-meta">
+              <span class="attendance-meta-key">Today</span>
+              <span class="attendance-meta-val" id="today-time">--:--:--</span>
+            </div>
+          </div>
         </section>
 
         <section class="stats-row">
