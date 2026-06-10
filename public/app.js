@@ -957,7 +957,8 @@ async function api(method, path, body) {
   const opts  = { method, headers: {} };
   if (token) opts.headers['Authorization'] = `Bearer ${token}`;
   if (body)  { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
-  const res  = await fetch(path, opts);
+  const API_URL = "https://attendx-42v6.onrender.com";
+  const res = await fetch(`${API_URL}${path}`, opts);
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
   return data;
